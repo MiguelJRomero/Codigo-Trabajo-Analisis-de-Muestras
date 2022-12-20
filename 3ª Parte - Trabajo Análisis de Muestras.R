@@ -457,7 +457,7 @@ datos.diagrama.barra.rel = data.frame(neduc=c("Total","Total",                  
 Nivel.educativo.rel = reorder(datos.diagrama.barra.rel$neduc,                           # Factor de niveles educativos
                               datos.diagrama.barra.rel$posicion)
 
-ggplot(datos.diagrama.barra.prop, aes(fill=sitemp, y=totales,                           # Diagrama de barras apiladas de frecuencias relativas de empleados y desempleados
+ggplot(datos.diagrama.barra.rel, aes(fill=sitemp, y=totales,                            # Diagrama de barras apiladas de frecuencias relativas de empleados y desempleados
                                       x=Nivel.educativo.rel)) + 
   geom_bar(sitemp="stack", stat="identity") +
   geom_text(y = -0.015, aes(label = neduc)) +
