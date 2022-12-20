@@ -1,10 +1,10 @@
-#### Código Trabajo Análisis de Muestras - 3ª Parte ####
+#### CÃ³digo Trabajo AnÃ¡lisis de Muestras - 3Âª Parte ####
 
 ##############################################################################################################
 
-### Generación de datos ###
+### GeneraciÃ³n de datos ###
 
-if (!require(sae)) install.packages("sae")
+if (!require("sae")) install.packages("sae")
 library("sae")
 data(incomedata)
 
@@ -12,7 +12,7 @@ set.seed(292)
 NIU = 100452943
 plus = round(runif(1,0,500))
 set.seed(NIU+plus)
-cual = sample(1:17,1)       # Devuelve 1: Andalucía
+cual = sample(1:17,1)       # Devuelve 1: AndalucÃ­a
 
 datosECV = incomedata
 datosECVmas16 = subset(datosECV, (datosECV$labor>0))
@@ -48,69 +48,69 @@ datos[which(datos$sitemp==2),8] = 1
 
 ##############################################################################################################
 
-### Estimación de los ingresos medios y tasa de paro por estimadores de muestreo simple aleatorio ###
+### EstimaciÃ³n de los ingresos medios y tasa de paro por estimadores de muestreo simple aleatorio ###
 
 ##############################################################################################################
 
 
-### Generación de la muestra ###
+### GeneraciÃ³n de la muestra ###
 
-N.act = nrow(datos)                                                                     # Tamaño de la población activa
-n.act = ceiling(N.act/10)                                                               # Tamaño de la muestra de población activa
+N.act = nrow(datos)                                                                     # TamaÃ±o de la poblaciÃ³n activa
+n.act = ceiling(N.act/10)                                                               # TamaÃ±o de la muestra de poblaciÃ³n activa
 
-mas.act = datos[sample(1:N.act, n.act, replace = FALSE),]                               # Muestra de población activa
+mas.act = datos[sample(1:N.act, n.act, replace = FALSE),]                               # Muestra de poblaciÃ³n activa
 mas.emp = mas.act[which(mas.act$sitemp == 0),]                                          # Submuestra de empleados
 
-N.emp = length(which(datos$sitemp == 0))                                                # Número total de empleados
-n.emp = nrow(mas.emp)                                                                   # Tamaño de la submuestra de empleados
+N.emp = length(which(datos$sitemp == 0))                                                # NÃºmero total de empleados
+n.emp = nrow(mas.emp)                                                                   # TamaÃ±o de la submuestra de empleados
 
 
 ##############################################################################################################
 
 
-### Estimación de los ingresos medios ###
+### EstimaciÃ³n de los ingresos medios ###
 
 if (!require("survey")) install.packages("survey")                                      
 library("survey")
 
-mas.emp$tamaño = N.emp                                                                   
-diseño.emp.mas = svydesign(id = ~1, fpc = ~tamaño, data = mas.emp)                      # Diseño muestral del muestreo aleatorio simple de empleados
+mas.emp$tamaÃ±o = N.emp                                                                   
+diseÃ±o.emp.mas = svydesign(id = ~1, fpc = ~tamaÃ±o, data = mas.emp)                      # DiseÃ±o muestral del muestreo aleatorio simple de empleados
 
-svymean(~ingnorm, diseño.emp.mas, na.rm = TRUE)                                         # Estimación de los ingresos medios de empleados y de su error estándar
-confint(svymean(~ingnorm, diseño.emp.mas, na.rm = TRUE))                                # Intervalo de confianza de los ingresos medios de empleados
-
-
-##############################################################################################################
-
-
-### Estimación de la tasa de paro ###
-
-mas.act$tamaño = N.act                                               
-diseño.act.mas = svydesign(id = ~1, fpc = ~tamaño, data = mas.act)                      # Diseño muestral del muestreo aleatorio simple de población activa
-
-svymean(~sitemp, diseño.act.mas, na.rm = TRUE)                                          # Estimación de la tasa de paro y de su error estándar
-confint(svymean(~sitemp, diseño.act.mas, na.rm = TRUE))                                 # Intervalo de confianza de la tasa de paro
+svymean(~ingnorm, diseÃ±o.emp.mas, na.rm = TRUE)                                         # EstimaciÃ³n de los ingresos medios de empleados y de su error estÃ¡ndar
+confint(svymean(~ingnorm, diseÃ±o.emp.mas, na.rm = TRUE))                                # Intervalo de confianza de los ingresos medios de empleados
 
 
 ##############################################################################################################
 
-### Estimación de los ingresos medios y tasa de paro por estimadores de razón y regresión ###
+
+### EstimaciÃ³n de la tasa de paro ###
+
+mas.act$tamaÃ±o = N.act                                               
+diseÃ±o.act.mas = svydesign(id = ~1, fpc = ~tamaÃ±o, data = mas.act)                      # DiseÃ±o muestral del muestreo aleatorio simple de poblaciÃ³n activa
+
+svymean(~sitemp, diseÃ±o.act.mas, na.rm = TRUE)                                          # EstimaciÃ³n de la tasa de paro y de su error estÃ¡ndar
+confint(svymean(~sitemp, diseÃ±o.act.mas, na.rm = TRUE))                                 # Intervalo de confianza de la tasa de paro
+
+
+##############################################################################################################
+
+### EstimaciÃ³n de los ingresos medios y tasa de paro por estimadores de razÃ³n y regresiÃ³n ###
 
 ##############################################################################################################
 
 
-### Estimación de los ingresos medios a través del estimador de razón ###
+### EstimaciÃ³n de los ingresos medios a travÃ©s del estimador de razÃ³n ###
 
 media.horas.trabajo.emp = mean(datos[which(datos$sitemp == 0),10])                      # Horas de trabajo promedio de los empleados
-predict(svyratio(~ingnorm, ~horas, design = diseño.emp.mas),                            # Estimación de los ingresos medios de empleados
+predict(svyratio(~ingnorm, ~horas, design = diseÃ±o.emp.mas),                            # EstimaciÃ³n de los ingresos medios de empleados
         total = media.horas.trabajo.emp, se = FALSE)
 
-R.ingresos = mean(mas.emp$ingnorm)/mean(mas.emp$horas)                                  # Estimación de la razón entre ingresos medios y horas de trabajo promedio de empleados
-ing.medios.razon = R.ingresos*media.horas.trabajo.emp                                   # Estimación de los ingresos medios de empleados
-var.ing.medios.razon = (1/n.emp - 1/N.emp)*                                             # Estimación de la arianza del estimador de razón de los ingresos medios de empleados
+R.ingresos = mean(mas.emp$ingnorm)/mean(mas.emp$horas)                                  # EstimaciÃ³n de la razÃ³n entre ingresos medios y horas de trabajo promedio de empleados
+ing.medios.razon = R.ingresos*media.horas.trabajo.emp                                   # EstimaciÃ³n de los ingresos medios de empleados
+var.ing.medios.razon = (1/n.emp - 1/N.emp)*                                             # EstimaciÃ³n de la arianza del estimador de razÃ³n de los ingresos medios de empleados
                        sum((mas.emp$ingnorm - R.ingresos*mas.emp$horas)^2)/(n.emp-1)
 
-sqrt(var.ing.medios.razon)                                                              # Estimación del error estándar del estimador de razón de los ingresos medios de empleados
+sqrt(var.ing.medios.razon)                                                              # EstimaciÃ³n del error estÃ¡ndar del estimador de razÃ³n de los ingresos medios de empleados
 
 centro = ing.medios.razon
 radio = qnorm(0.025, lower.tail = FALSE)*sqrt(var.ing.medios.razon)
@@ -122,18 +122,18 @@ IC.ing.medios.razon                                                             
 ##############################################################################################################
 
 
-### Estimación de la tasa de paro a través del estimador de razón ###
+### EstimaciÃ³n de la tasa de paro a travÃ©s del estimador de razÃ³n ###
 
-media.horas.trabajo.act = mean(datos$horas)                                             # Horas de trabajo promedio de la poblacióna activa
-predict(svyratio(~sitemp, ~horas, design = diseño.act.mas),                             # Estimación de la tasa de paro
+media.horas.trabajo.act = mean(datos$horas)                                             # Horas de trabajo promedio de la poblaciÃ³na activa
+predict(svyratio(~sitemp, ~horas, design = diseÃ±o.act.mas),                             # EstimaciÃ³n de la tasa de paro
         total = media.horas.trabajo.act, se = FALSE)
 
-R.tasa.paro = mean(mas.act$sitemp)/mean(mas.act$horas)                                  # Estimación de la razón entre tasa de paro y horas de trabajo promedio de la población activa
-tasa.paro.razon = R.tasa.paro*media.horas.trabajo.act                                   # Estimación de la tasa de paro
-var.tasa.paro.razon = (1/n.act - 1/N.act)*                                              # Estimación de la varianza del estimador de razón de la tasa de paro
+R.tasa.paro = mean(mas.act$sitemp)/mean(mas.act$horas)                                  # EstimaciÃ³n de la razÃ³n entre tasa de paro y horas de trabajo promedio de la poblaciÃ³n activa
+tasa.paro.razon = R.tasa.paro*media.horas.trabajo.act                                   # EstimaciÃ³n de la tasa de paro
+var.tasa.paro.razon = (1/n.act - 1/N.act)*                                              # EstimaciÃ³n de la varianza del estimador de razÃ³n de la tasa de paro
                       sum((mas.act$sitemp - R.tasa.paro*mas.act$horas)^2)/(n.act-1)
 
-sqrt(var.tasa.paro.razon)                                                               # Estimación del error estándar del estimador de razón de la tasa de paro  
+sqrt(var.tasa.paro.razon)                                                               # EstimaciÃ³n del error estÃ¡ndar del estimador de razÃ³n de la tasa de paro  
 
 centro = tasa.paro.razon
 radio = qnorm(0.025, lower.tail = FALSE)*sqrt(var.tasa.paro.razon)
@@ -145,22 +145,22 @@ IC.tasa.paro.razon                                                              
 ##############################################################################################################
 
 
-### Estimación de los ingresos medios a través del estimador de regresión ###
+### EstimaciÃ³n de los ingresos medios a travÃ©s del estimador de regresiÃ³n ###
 
-diseño.emp.regresion = calibrate(diseño.emp.mas, formula = ~horas,                      # Diseño muestral para el estimador de regresión
+diseÃ±o.emp.regresion = calibrate(diseÃ±o.emp.mas, formula = ~horas,                      # DiseÃ±o muestral para el estimador de regresiÃ³n
                                  population = c("(Intercept)" = N.emp,
                                  horas = media.horas.trabajo.emp*N.emp))
-svymean(~ingnorm, diseño.emp.regresion)[1]                                              # Estimación de los ingresos medios de empleados
+svymean(~ingnorm, diseÃ±o.emp.regresion)[1]                                              # EstimaciÃ³n de los ingresos medios de empleados
 
-b.ingresos = cov(mas.emp$ingnorm, mas.emp$horas)/var(mas.emp$horas)                     # Estimación de la pendiente de regresión entre ingresos medios y horas trabajadas de los empleados
-ing.medios.regresion = mean(mas.emp$ingnorm) +                                          # Estimación de los ingresos medios de empleados
+b.ingresos = cov(mas.emp$ingnorm, mas.emp$horas)/var(mas.emp$horas)                     # EstimaciÃ³n de la pendiente de regresiÃ³n entre ingresos medios y horas trabajadas de los empleados
+ing.medios.regresion = mean(mas.emp$ingnorm) +                                          # EstimaciÃ³n de los ingresos medios de empleados
                        b.ingresos*(media.horas.trabajo.emp - mean(mas.emp$horas))
-var.ing.medios.regresion = (1/n.emp - 1/N.emp)*                                         # Estimación de la varianza del estimador de regresión de los ingresos medios de empleados
+var.ing.medios.regresion = (1/n.emp - 1/N.emp)*                                         # EstimaciÃ³n de la varianza del estimador de regresiÃ³n de los ingresos medios de empleados
                            (sum((mas.emp$ingnorm - mean(mas.emp$ingnorm))^2)/
                            (n.emp-2) - cov(mas.emp$ingnorm,mas.emp$horas)^2/
                            var(mas.emp$horas))
 
-sqrt(var.ing.medios.regresion)                                                          # Estimación del error estándar del estimador de regresión de los ingresos medios de empleados
+sqrt(var.ing.medios.regresion)                                                          # EstimaciÃ³n del error estÃ¡ndar del estimador de regresiÃ³n de los ingresos medios de empleados
 
 centro = ing.medios.regresion
 radio = qnorm(0.025, lower.tail = FALSE)*sqrt(var.ing.medios.regresion)
@@ -172,22 +172,22 @@ IC.ing.medios.regresion                                                         
 ##############################################################################################################
 
 
-### Estimación de la tasa de paro a través del estimador de regresión ###
+### EstimaciÃ³n de la tasa de paro a travÃ©s del estimador de regresiÃ³n ###
 
-diseño.act.regresion = calibrate(diseño.act.mas, formula = ~horas,                      # Diseño muestral para el estimador de regresión
+diseÃ±o.act.regresion = calibrate(diseÃ±o.act.mas, formula = ~horas,                      # DiseÃ±o muestral para el estimador de regresiÃ³n
                                  population = c("(Intercept)" = N.act,
                                  horas = media.horas.trabajo.act*N.act))
-svymean(~sitemp, diseño.act.regresion)[1]                                               # Estimación de la tasa de paro
+svymean(~sitemp, diseÃ±o.act.regresion)[1]                                               # EstimaciÃ³n de la tasa de paro
 
-b.tasa.paro = cov(mas.act$sitemp, mas.act$horas)/var(mas.act$horas)                     # Estimación de la pendiente de regresión entre situación de empleo y horas trabajadas de la población activa
-tasa.paro.regresion = mean(mas.act$sitemp) +                                            # Estimación de la tasa de paro
-                      b.tasa.paro*(media.horas.trabajo.act - mean(mas.act$horas))       # Estimación de la varianza del estimador de regresión de la tasa de paro
+b.tasa.paro = cov(mas.act$sitemp, mas.act$horas)/var(mas.act$horas)                     # EstimaciÃ³n de la pendiente de regresiÃ³n entre situaciÃ³n de empleo y horas trabajadas de la poblaciÃ³n activa
+tasa.paro.regresion = mean(mas.act$sitemp) +                                            # EstimaciÃ³n de la tasa de paro
+                      b.tasa.paro*(media.horas.trabajo.act - mean(mas.act$horas))       # EstimaciÃ³n de la varianza del estimador de regresiÃ³n de la tasa de paro
 var.tasa.paro.regresion = (1/n.act-1/N.act)*
                           (sum((mas.act$sitemp-mean(mas.act$sitemp))^2)/
                           (n.act-2)-cov(mas.act$sitemp,mas.act$horas)^2/
                           var(mas.act$horas))
 
-sqrt(var.tasa.paro.regresion)                                                           # Estimación del error estándar del estimador de regresión de la tasa de paro
+sqrt(var.tasa.paro.regresion)                                                           # EstimaciÃ³n del error estÃ¡ndar del estimador de regresiÃ³n de la tasa de paro
 
 centro = tasa.paro.regresion
 radio = qnorm(0.025, lower.tail = FALSE)*sqrt(var.tasa.paro.regresion)
@@ -198,129 +198,129 @@ IC.tasa.paro.regresion                                                          
 
 ##############################################################################################################
 
-### Estimación de los ingresos medios y tasa de paro por estimadores de muestreo estratificado ###
+### EstimaciÃ³n de los ingresos medios y tasa de paro por estimadores de muestreo estratificado ###
 
 ##############################################################################################################
 
-### Definición de tamaños poblacionales, muestrales y pesos de los empleados de cada estrato ###
+### DefiniciÃ³n de tamaÃ±os poblacionales, muestrales y pesos de los empleados de cada estrato ###
 
 mas.emp.1 = mas.emp[which(mas.emp$neduc == 1),]                                         # Submuestra de empleados con nivel educativo de primaria
 mas.emp.2 = mas.emp[which(mas.emp$neduc == 2),]                                         # Submuestra de empleados con nivel educativo de secunaria                                      
 mas.emp.3 = mas.emp[which(mas.emp$neduc == 3),]                                         # Submuestra de empleados con nivel educativo de postsecundaria
 
-N1.emp = length(which(datos$neduc == 1 & datos$sitemp == 0))                            # Número total de empleados con nivel educativo de primaria
-N2.emp = length(which(datos$neduc == 2 & datos$sitemp == 0))                            # Número total de empleados con nivel educativo de secundaria
-N3.emp = length(which(datos$neduc == 3 & datos$sitemp == 0))                            # Número total de empleados con nivel educativo de postsecundaria
+N1.emp = length(which(datos$neduc == 1 & datos$sitemp == 0))                            # NÃºmero total de empleados con nivel educativo de primaria
+N2.emp = length(which(datos$neduc == 2 & datos$sitemp == 0))                            # NÃºmero total de empleados con nivel educativo de secundaria
+N3.emp = length(which(datos$neduc == 3 & datos$sitemp == 0))                            # NÃºmero total de empleados con nivel educativo de postsecundaria
 
 W1.emp = N1.emp/N.emp                                                                   # Peso del estrato de empleados con nivel educativo de primaria
 W2.emp = N2.emp/N.emp                                                                   # Peso del estrato de empleados con nivel educativo de secundaria
 W3.emp = N3.emp/N.emp                                                                   # Peso del estrato de empleados con nivel educativo de postsecundaria
 
-n1.emp = nrow(mas.emp.1)                                                                # Tamaño de la submuestra de empleados con nivel educativo de primaria
-n2.emp = nrow(mas.emp.2)                                                                # Tamaño de la submuestra de empleados con nivel educativo de secundaria
-n3.emp = nrow(mas.emp.3)                                                                # Tamaño de la submuestra de empleados con nivel educativo de postsecundaria
+n1.emp = nrow(mas.emp.1)                                                                # TamaÃ±o de la submuestra de empleados con nivel educativo de primaria
+n2.emp = nrow(mas.emp.2)                                                                # TamaÃ±o de la submuestra de empleados con nivel educativo de secundaria
+n3.emp = nrow(mas.emp.3)                                                                # TamaÃ±o de la submuestra de empleados con nivel educativo de postsecundaria
 
 
 ##############################################################################################################
 
 
-### Estimación de los ingresos medios a través del estimador de muestreo estratificado ###
+### EstimaciÃ³n de los ingresos medios a travÃ©s del estimador de muestreo estratificado ###
 
 if (!require("sampling")) install.packages("sampling")
 library("sampling")
 
-datos = datos[order(datos$neduc),]                                                      # Generación de una muestra de empleados estratificada por niveles educativos
+datos = datos[order(datos$neduc),]                                                      # GeneraciÃ³n de una muestra de empleados estratificada por niveles educativos
 mae.emp.estratos = strata(datos[which(datos$sitemp == 0),], "neduc",
                           size = c(n1.emp,n2.emp,n3.emp), method = "srswor")
 datos$neduc = as.factor(datos$neduc)
 muestra.emp.estratos = getdata(datos, mae.emp.estratos)
-muestra.emp.estratos$tamaño = with(muestra.emp.estratos,
+muestra.emp.estratos$tamaÃ±o = with(muestra.emp.estratos,
                                    ifelse(neduc == "1", N1.emp,
                                           ifelse(neduc == "2", N2.emp, N3.emp)))
 muestra.emp.estratos$pesos = 1/muestra.emp.estratos$Prob
 
 mas.emp = mas.emp[order(mas.emp$neduc),]
-muestra.emp.estratos[,1:10] = mas.emp[,c(1:6,8:10,7)]                                   # Sustitución de datos de empleados por los de la submuestra original
+muestra.emp.estratos[,1:10] = mas.emp[,c(1:6,8:10,7)]                                   # SustituciÃ³n de datos de empleados por los de la submuestra original
 
-diseño.emp.estratos = svydesign(id = ~1, weights = ~pesos, fpc = ~tamaño,               # Diseño muestral del muestreo aleatorio estratificado de empleados
+diseÃ±o.emp.estratos = svydesign(id = ~1, weights = ~pesos, fpc = ~tamaÃ±o,               # DiseÃ±o muestral del muestreo aleatorio estratificado de empleados
                                 strat = ~neduc, data = muestra.emp.estratos)
-svymean(~ingnorm, diseño.emp.estratos, na.rm = TRUE)                                    # Estimación de los ingresos medios globales de empleados y de su error estándar
-confint(svymean(~ingnorm, diseño.emp.estratos, na.rm = TRUE))                           # Intervalo de confianza de los ingresos medios de empleados
+svymean(~ingnorm, diseÃ±o.emp.estratos, na.rm = TRUE)                                    # EstimaciÃ³n de los ingresos medios globales de empleados y de su error estÃ¡ndar
+confint(svymean(~ingnorm, diseÃ±o.emp.estratos, na.rm = TRUE))                           # Intervalo de confianza de los ingresos medios de empleados
 
-ing.medios.estratos = svyby(~ingnorm, ~neduc, diseño.emp.estratos, svymean)             # Estimación de los ingresos medios de empleados de cada estrato
+ing.medios.estratos = svyby(~ingnorm, ~neduc, diseÃ±o.emp.estratos, svymean)             # EstimaciÃ³n de los ingresos medios de empleados de cada estrato
 ing.medios.estratos
 
 c(ing.medios.estratos[1,2]-ing.medios.estratos[1,3]/sqrt(0.05/3),                       # Intervalo de confianza por Chebyshev de los ingresos medios de empleados con nivel educativo de primaria
   ing.medios.estratos[1,2]+ing.medios.estratos[1,3]/sqrt(0.05/3))
-confint(ing.medios.estratos, level = 1-0.05/3)[2,]                                      # Intervalo de confianza por aproximación a la normal de los ingresos medios de empleados con nivel educativo de secundaria
+confint(ing.medios.estratos, level = 1-0.05/3)[2,]                                      # Intervalo de confianza por aproximaciÃ³n a la normal de los ingresos medios de empleados con nivel educativo de secundaria
 c(max(0,ing.medios.estratos[3,2]-ing.medios.estratos[3,3]/sqrt(0.05/3)),                # Intervalo de confianza por Chebyshev de los ingresos medios de empleados con nivel educativo de postsecundaria
   ing.medios.estratos[3,2]+ing.medios.estratos[3,3]/sqrt(0.05/3))
 
-# confint(ing.medios.estratos, level = 1-0.05/3)                                        # Intervalos de confianza por aproximación a la normal de los ingresos medios de empleados de cada estrato
+# confint(ing.medios.estratos, level = 1-0.05/3)                                        # Intervalos de confianza por aproximaciÃ³n a la normal de los ingresos medios de empleados de cada estrato
 
 
 ##############################################################################################################
 
 
-### Definición de tamaños poblacionales, muestrales y pesos de los miembros de la población activa de cada estrato ###
+### DefiniciÃ³n de tamaÃ±os poblacionales, muestrales y pesos de los miembros de la poblaciÃ³n activa de cada estrato ###
 
-mas.act.1 = mas.act[which(mas.act$neduc == 1),]                                         # Submuestra de miembros de la poblacióna activa con nivel educativo de primaria
-mas.act.2 = mas.act[which(mas.act$neduc == 2),]                                         # Submuestra de miembros de la poblacióna activa con nivel educativo de secundaria
-mas.act.3 = mas.act[which(mas.act$neduc == 3),]                                         # Submuestra de miembros de la poblacióna activa con nivel educativo de postsecundaria
+mas.act.1 = mas.act[which(mas.act$neduc == 1),]                                         # Submuestra de miembros de la poblaciÃ³na activa con nivel educativo de primaria
+mas.act.2 = mas.act[which(mas.act$neduc == 2),]                                         # Submuestra de miembros de la poblaciÃ³na activa con nivel educativo de secundaria
+mas.act.3 = mas.act[which(mas.act$neduc == 3),]                                         # Submuestra de miembros de la poblaciÃ³na activa con nivel educativo de postsecundaria
 
-N1.act = length(which(datos$neduc == 1))                                                # Número total de miembros de la poblacióna activa con nivel educativo de primaria
-N2.act = length(which(datos$neduc == 2))                                                # Número total de miembros de la poblacióna activa con nivel educativo de secundaria
-N3.act = length(which(datos$neduc == 3))                                                # Número total de miembros de la poblacióna activa con nivel educativo de postsecundaria
+N1.act = length(which(datos$neduc == 1))                                                # NÃºmero total de miembros de la poblaciÃ³na activa con nivel educativo de primaria
+N2.act = length(which(datos$neduc == 2))                                                # NÃºmero total de miembros de la poblaciÃ³na activa con nivel educativo de secundaria
+N3.act = length(which(datos$neduc == 3))                                                # NÃºmero total de miembros de la poblaciÃ³na activa con nivel educativo de postsecundaria
 
-W1.act = N1.act/N.act                                                                   # Peso del estrato de miembros de la población activa con nivel educativo de primaria
-W2.act = N2.act/N.act                                                                   # Peso del estrato de miembros de la población activa con nivel educativo de secundaria
-W3.act = N3.act/N.act                                                                   # Peso del estrato de miembros de la población activa con nivel educativo de postsecundaria
+W1.act = N1.act/N.act                                                                   # Peso del estrato de miembros de la poblaciÃ³n activa con nivel educativo de primaria
+W2.act = N2.act/N.act                                                                   # Peso del estrato de miembros de la poblaciÃ³n activa con nivel educativo de secundaria
+W3.act = N3.act/N.act                                                                   # Peso del estrato de miembros de la poblaciÃ³n activa con nivel educativo de postsecundaria
 
-n1.act = nrow(mas.act.1)                                                                # Tamaño de la submuestra de miembros de la poblacióna activa con nivel educativo de primaria
-n2.act = nrow(mas.act.2)                                                                # Tamaño de la submuestra de miembros de la poblacióna activa con nivel educativo de secundaria
-n3.act = nrow(mas.act.3)                                                                # Tamaño de la submuestra de miembros de la poblacióna activa con nivel educativo de postsecundaria
+n1.act = nrow(mas.act.1)                                                                # TamaÃ±o de la submuestra de miembros de la poblaciÃ³na activa con nivel educativo de primaria
+n2.act = nrow(mas.act.2)                                                                # TamaÃ±o de la submuestra de miembros de la poblaciÃ³na activa con nivel educativo de secundaria
+n3.act = nrow(mas.act.3)                                                                # TamaÃ±o de la submuestra de miembros de la poblaciÃ³na activa con nivel educativo de postsecundaria
 
 
 ##############################################################################################################
 
 
-### Estimación de la tasa de paro a través del estimador de muestreo estratificado ###
+### EstimaciÃ³n de la tasa de paro a travÃ©s del estimador de muestreo estratificado ###
 
-mae.act.estratos = strata(datos, "neduc",                    # Generación de una muestra de miembros de la población activa estratificada por niveles educativos
+mae.act.estratos = strata(datos, "neduc",                    # GeneraciÃ³n de una muestra de miembros de la poblaciÃ³n activa estratificada por niveles educativos
                           size = c(n1.act,n2.act,n3.act), method = "srswor")
 datos$neduc = as.factor(datos$neduc)
 muestra.act.estratos = getdata(datos, mae.act.estratos)
-muestra.act.estratos$tamaño = with(muestra.act.estratos,
+muestra.act.estratos$tamaÃ±o = with(muestra.act.estratos,
                                    ifelse(neduc == "1", N1.act,
                                           ifelse(neduc == "2", N2.act, N3.act)))
 muestra.act.estratos$pesos = 1/muestra.act.estratos$Prob
 
 mas.act = mas.act[order(mas.act$neduc),]
-muestra.act.estratos[,1:10] = mas.act[,c(1:6,8:10,7)]                                   # Sustitución de datos por los de la muestra original  
+muestra.act.estratos[,1:10] = mas.act[,c(1:6,8:10,7)]                                   # SustituciÃ³n de datos por los de la muestra original  
 
-diseño.act.estratos = svydesign(id = ~1, weights = ~pesos, fpc = ~tamaño,               # Diseño muestral del muestreo aleatorio estratificado de miembros de la poblacióna ctiva
+diseÃ±o.act.estratos = svydesign(id = ~1, weights = ~pesos, fpc = ~tamaÃ±o,               # DiseÃ±o muestral del muestreo aleatorio estratificado de miembros de la poblaciÃ³na ctiva
                                 strat = ~neduc, data = muestra.act.estratos)
-svymean(~sitemp, diseño.act.estratos, na.rm = TRUE)                                     # Estimación de la tasa de paro global y de su error estándar
-confint(svymean(~sitemp, diseño.act.estratos, na.rm = TRUE))                            # Intervalo de confianza de la tasa de paro global
+svymean(~sitemp, diseÃ±o.act.estratos, na.rm = TRUE)                                     # EstimaciÃ³n de la tasa de paro global y de su error estÃ¡ndar
+confint(svymean(~sitemp, diseÃ±o.act.estratos, na.rm = TRUE))                            # Intervalo de confianza de la tasa de paro global
 
-tasa.paro.estratos = svyby(~sitemp, ~neduc, diseño.act.estratos, svymean)               # Estimación de la tasa de paro de cada estrato
+tasa.paro.estratos = svyby(~sitemp, ~neduc, diseÃ±o.act.estratos, svymean)               # EstimaciÃ³n de la tasa de paro de cada estrato
 tasa.paro.estratos
 
-confint(tasa.paro.estratos, level = 1-0.05/3)[1:2,]                                     # Intervalos de confianza por aproximación a la normal de la tasa de paro de miembros de la población activa con niveles educativos de primaria y secundaria
-c(max(0,tasa.paro.estratos[3,2]-tasa.paro.estratos[3,3]/sqrt(0.05/3)),                  # Intervalo de confianza por Chebyshev de la tasa de paro de miembros de la población activa con nivel educativo de postsecundaria
+confint(tasa.paro.estratos, level = 1-0.05/3)[1:2,]                                     # Intervalos de confianza por aproximaciÃ³n a la normal de la tasa de paro de miembros de la poblaciÃ³n activa con niveles educativos de primaria y secundaria
+c(max(0,tasa.paro.estratos[3,2]-tasa.paro.estratos[3,3]/sqrt(0.05/3)),                  # Intervalo de confianza por Chebyshev de la tasa de paro de miembros de la poblaciÃ³n activa con nivel educativo de postsecundaria
   min(1,tasa.paro.estratos[3,2]+tasa.paro.estratos[3,3]/sqrt(0.05/3)))
 
-# confint(tasa.paro.estratos, level = 0.95)                                             # Intervalos de confianza por aproximacióna a la normal de la tasa de paro de cada estrato con nivel de confianza no corregido
+# confint(tasa.paro.estratos, level = 0.95)                                             # Intervalos de confianza por aproximaciÃ³na a la normal de la tasa de paro de cada estrato con nivel de confianza no corregido
 
 
 ##############################################################################################################
 
 
-### Histogramas y gráficos de caja de ingresos y situación laboral ###
+### Histogramas y grÃ¡ficos de caja de ingresos y situaciÃ³n laboral ###
 
 ## Histogramas de ingresos de los empleados ##
 
-intervalos.sturges <- function(x, cantidad = NULL) {                                    # Función que calcula los extremos de los intervalos dados por la regla de Sturges.
+intervalos.sturges <- function(x, cantidad = NULL) {                                    # FunciÃ³n que calcula los extremos de los intervalos dados por la regla de Sturges.
   if (is.null(cantidad) == TRUE) {
     cantidad = ceiling(1 + log(length(x))/log(2))
   }
@@ -336,7 +336,7 @@ muestra.emp.3 = muestra.emp.estratos[which(muestra.emp.estratos$neduc == 3),]   
 
 library(ggplot2)
 
-histograma <- function (df, variable.x, limites, titulo, xlabel, ylabel) {              # Función para construir los histogramas de ingresos de los empleados
+histograma <- function (df, variable.x, limites, titulo, xlabel, ylabel) {              # FunciÃ³n para construir los histogramas de ingresos de los empleados
   ggplot(data = df, aes(x = variable.x, y=..density.., weight = pesos)) +    
     geom_histogram(fill = "#BEBEBE", color = "black",
                    breaks = intervalos.sturges(variable.x)) + 
@@ -358,24 +358,24 @@ histograma(muestra.emp.estratos, muestra.emp.estratos$ingnorm, c(0,45000),      
            "Densidad")
 
 histograma(muestra.emp.1, muestra.emp.1$ingnorm, c(0,25000),                            # Histograma de ingresos de los empleados con nivel educativo de primaria
-           "Histograma de ingresos de los empleados con educación primaria",
+           "Histograma de ingresos de los empleados con educaciÃ³n primaria",
            "Ingresos (euros)", "Densidad")
 
 histograma(muestra.emp.2, muestra.emp.2$ingnorm, c(0,40000),                            # Histograma de ingresos de los empleados con nivel educativo de secundaria
-           "Histograma de ingresos de los empleados con educación secundaria",
+           "Histograma de ingresos de los empleados con educaciÃ³n secundaria",
            "Ingresos (euros)", "Densidad")
 
 histograma(muestra.emp.3, muestra.emp.3$ingnorm, c(0,50000),                            # Histograma de ingresos de los empleados con nivel educativo de postsecundaria
-           "Histograma de ingresos de los empleados con educación postsecundaria",
+           "Histograma de ingresos de los empleados con educaciÃ³n postsecundaria",
            "Ingresos (euros)", "Densidad")
 
-# svyhist(~ingnorm, diseño.emp.estratos, breaks = intervalos.sturges(mas.emp$ingnorm),    # Histograma de ingresos de los empleados
+# svyhist(~ingnorm, diseÃ±o.emp.estratos, breaks = intervalos.sturges(mas.emp$ingnorm),    # Histograma de ingresos de los empleados
 #         main = "Histograma de ingresos de empleados",)  
 
 
 ## Diagramas de caja de ingresos de los empleados ##
 
-datos.diagrama.caja.emp = rbind(muestra.emp.estratos,muestra.emp.estratos)              # Agrupación de los datos por grupos: global y de cada estrato
+datos.diagrama.caja.emp = rbind(muestra.emp.estratos,muestra.emp.estratos)              # AgrupaciÃ³n de los datos por grupos: global y de cada estrato
 datos.diagrama.caja.emp[1:78,10] = 0
 datos.diagrama.caja.emp$neduc = factor(datos.diagrama.caja.emp$neduc,
                                        labels = c("Total", "Primaria",
@@ -400,8 +400,8 @@ ggplot(data = datos.diagrama.caja.emp, aes(y = ingnorm, group = neduc,          
 
 ## Diagramas de barras apiladas ##
 
-frec.abs = c(n.act - svymean(~sitemp, diseño.act.estratos, na.rm = TRUE)[1]*n.act,      # Frecuencias absolutas de empleados y desempleados teniendo en cuenta los pesos de cada estrato
-             svymean(~sitemp, diseño.act.estratos, na.rm = TRUE)[1]*n.act,
+frec.abs = c(n.act - svymean(~sitemp, diseÃ±o.act.estratos, na.rm = TRUE)[1]*n.act,      # Frecuencias absolutas de empleados y desempleados teniendo en cuenta los pesos de cada estrato
+             svymean(~sitemp, diseÃ±o.act.estratos, na.rm = TRUE)[1]*n.act,
             length(which(mas.act.1$sitemp == 0)),
             length(which(mas.act.1$sitemp == 1)),
             length(which(mas.act.2$sitemp == 0)),
@@ -426,7 +426,7 @@ ggplot(datos.diagrama.barra.abs, aes(fill=sitemp, y=totales,                    
   geom_text(y = -2, aes(label = neduc)) +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
   ggtitle("Diagrama de barra de frecuencias absolutas de empleados y desempleados") +
-  ylab("Número de personas") +
+  ylab("NÃºmero de personas") +
   theme(panel.border = element_rect(fill = "transparent", color = "#030303",
                                     size = 2),
         plot.background = element_rect(fill = "#FFFFFF"),
@@ -437,8 +437,8 @@ ggplot(datos.diagrama.barra.abs, aes(fill=sitemp, y=totales,                    
         legend.background = element_rect(fill = "lavenderblush", colour = 1))
 
 
-frec.rel = c(1 - svymean(~sitemp, diseño.act.estratos, na.rm = TRUE)[1],                # Frecuencias relativas de empleados y desempleados teniendo en cuenta los pesos de cada estrato
-             svymean(~sitemp, diseño.act.estratos, na.rm = TRUE)[1],
+frec.rel = c(1 - svymean(~sitemp, diseÃ±o.act.estratos, na.rm = TRUE)[1],                # Frecuencias relativas de empleados y desempleados teniendo en cuenta los pesos de cada estrato
+             svymean(~sitemp, diseÃ±o.act.estratos, na.rm = TRUE)[1],
             length(which(mas.act.1$sitemp == 0))/n1.act,
             length(which(mas.act.1$sitemp == 1))/n1.act,
             length(which(mas.act.2$sitemp == 0))/n2.act,
@@ -463,7 +463,7 @@ ggplot(datos.diagrama.barra.prop, aes(fill=sitemp, y=totales,                   
   geom_text(y = -0.015, aes(label = neduc)) +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
   ggtitle("Diagrama de barra de frecuencias relativas de empleados y desempleados") +
-  ylab("Número de personas") +
+  ylab("NÃºmero de personas") +
   theme(panel.border = element_rect(fill = "transparent", color = "#030303",
                                     size = 2),
         plot.background = element_rect(fill = "#FFFFFF"),
@@ -477,41 +477,41 @@ ggplot(datos.diagrama.barra.prop, aes(fill=sitemp, y=totales,                   
 ##############################################################################################################
 
 
-### Cálculo de afijación de Neyman para estimación de los ingresos medios ###
+### CÃ¡lculo de afijaciÃ³n de Neyman para estimaciÃ³n de los ingresos medios ###
 
 vars.emp = c(var(mas.emp.1$ingnorm), var(mas.emp.2$ingnorm), var(mas.emp.3$ingnorm))    # Vector de varianzas estimadas de ingresos de cada estrato
 pesos.emp = c(W1.emp, W2.emp, W3.emp)                                                   # Vector de pesos de cada estrato
 
-1/n.emp*sum((1-sum(pesos.emp*sqrt(vars.emp))/sqrt(vars.emp))*pesos.emp*vars.emp)        # Estimación de diferencia de varianzas de afijación proporcional y de Neyman (con varianzas estimadas) en la estimación de ingresos medios
+1/n.emp*sum((1-sum(pesos.emp*sqrt(vars.emp))/sqrt(vars.emp))*pesos.emp*vars.emp)        # EstimaciÃ³n de diferencia de varianzas de afijaciÃ³n proporcional y de Neyman (con varianzas estimadas) en la estimaciÃ³n de ingresos medios
 
 
 suma.sd.emp = sum(pesos.emp*sqrt(vars.emp))                                             
-n1.ingresos.neyman = round(n.emp*W1.emp*sqrt(var(mas.emp.1$ingnorm))/suma.sd.emp)       # Estimación del tamaño muestral óptimo en la estimación de ingresos medios para el nivel educativo de primaria
-n2.ingresos.neyman = round(n.emp*W2.emp*sqrt(var(mas.emp.2$ingnorm))/suma.sd.emp)       # Estimación del tamaño muestral óptimo en la estimación de ingresos medios para el nivel educativo de secundaria
-n3.ingresos.neyman = round(n.emp*W3.emp*sqrt(var(mas.emp.3$ingnorm))/suma.sd.emp)       # Estimación del tamaño muestral óptimo en la estimación de ingresos medios para el nivel educativo de postsecundaria
+n1.ingresos.neyman = round(n.emp*W1.emp*sqrt(var(mas.emp.1$ingnorm))/suma.sd.emp)       # EstimaciÃ³n del tamaÃ±o muestral Ã³ptimo en la estimaciÃ³n de ingresos medios para el nivel educativo de primaria
+n2.ingresos.neyman = round(n.emp*W2.emp*sqrt(var(mas.emp.2$ingnorm))/suma.sd.emp)       # EstimaciÃ³n del tamaÃ±o muestral Ã³ptimo en la estimaciÃ³n de ingresos medios para el nivel educativo de secundaria
+n3.ingresos.neyman = round(n.emp*W3.emp*sqrt(var(mas.emp.3$ingnorm))/suma.sd.emp)       # EstimaciÃ³n del tamaÃ±o muestral Ã³ptimo en la estimaciÃ³n de ingresos medios para el nivel educativo de postsecundaria
 
-c(n1.ingresos.neyman,n2.ingresos.neyman,n3.ingresos.neyman)                             # Afijación de Neyman con varianzas estimadas para la estimación de los ingresos medios de empleados
+c(n1.ingresos.neyman,n2.ingresos.neyman,n3.ingresos.neyman)                             # AfijaciÃ³n de Neyman con varianzas estimadas para la estimaciÃ³n de los ingresos medios de empleados
 
-# afijacion.proporcional.ingresos = round(n.emp*pesos.emp)                              # Afijación proporcional para la estimación de los ingresos medios de empleados
+# afijacion.proporcional.ingresos = round(n.emp*pesos.emp)                              # AfijaciÃ³n proporcional para la estimaciÃ³n de los ingresos medios de empleados
 
 
 ##############################################################################################################
 
 
-### Cálculo de afijación de Neyman para estimación de la tasa de paro ###
+### CÃ¡lculo de afijaciÃ³n de Neyman para estimaciÃ³n de la tasa de paro ###
 
-vars.act = c(var(mas.act.1$sitemp), var(mas.act.2$sitemp), var(mas.act.3$sitemp))       # Vector de varianzas estimadas de situación de empleo de cada estrato
+vars.act = c(var(mas.act.1$sitemp), var(mas.act.2$sitemp), var(mas.act.3$sitemp))       # Vector de varianzas estimadas de situaciÃ³n de empleo de cada estrato
 pesos.act = c(W1.act, W2.act, W3.act)                                                   # Vector de pesos de cada estrato
 
-1/n.act*sum((1-sum(pesos.act*sqrt(vars.act))/sqrt(vars.act))*pesos.act*vars.act)        # Estimación de diferencia de varianzas de afijación proporcional y de Neyman (con varianzas estimadas) en la estimación de tasa de paro
+1/n.act*sum((1-sum(pesos.act*sqrt(vars.act))/sqrt(vars.act))*pesos.act*vars.act)        # EstimaciÃ³n de diferencia de varianzas de afijaciÃ³n proporcional y de Neyman (con varianzas estimadas) en la estimaciÃ³n de tasa de paro
 
 
 suma.sd.act = sum(pesos.act*sqrt(vars.act))                             
-n1.tasa.paro.neyman = round(n.act*W1.act*sqrt(var(mas.act.1$sitemp))/suma.sd.act)       # Estimación del tamaño muestral óptimo en la estimación de la tasa de paro para el nivel educativo de primaria   
-n2.tasa.paro.neyman = round(n.act*W2.act*sqrt(var(mas.act.2$sitemp))/suma.sd.act)       # Estimación del tamaño muestral óptimo en la estimación de la tasa de paro para el nivel educativo de secundaria   
-n3.tasa.paro.neyman = round(n.act*W3.act*sqrt(var(mas.act.3$sitemp))/suma.sd.act)       # Estimación del tamaño muestral óptimo en la estimación de la tasa de paro para el nivel educativo de postsecundaria
+n1.tasa.paro.neyman = round(n.act*W1.act*sqrt(var(mas.act.1$sitemp))/suma.sd.act)       # EstimaciÃ³n del tamaÃ±o muestral Ã³ptimo en la estimaciÃ³n de la tasa de paro para el nivel educativo de primaria   
+n2.tasa.paro.neyman = round(n.act*W2.act*sqrt(var(mas.act.2$sitemp))/suma.sd.act)       # EstimaciÃ³n del tamaÃ±o muestral Ã³ptimo en la estimaciÃ³n de la tasa de paro para el nivel educativo de secundaria   
+n3.tasa.paro.neyman = round(n.act*W3.act*sqrt(var(mas.act.3$sitemp))/suma.sd.act)       # EstimaciÃ³n del tamaÃ±o muestral Ã³ptimo en la estimaciÃ³n de la tasa de paro para el nivel educativo de postsecundaria
 
-c(n1.tasa.paro.neyman,n2.tasa.paro.neyman,n3.tasa.paro.neyman)                          # Afijación de Neyman con varianzas estimadas para la estimación de la tasa de paro
+c(n1.tasa.paro.neyman,n2.tasa.paro.neyman,n3.tasa.paro.neyman)                          # AfijaciÃ³n de Neyman con varianzas estimadas para la estimaciÃ³n de la tasa de paro
 
-# afijacion.proporcional.tasa.paro = round(n.act*pesos.act)                             # Afijación proporcional para la estimación de la tasa de paro
+# afijacion.proporcional.tasa.paro = round(n.act*pesos.act)                             # AfijaciÃ³n proporcional para la estimaciÃ³n de la tasa de paro
 
